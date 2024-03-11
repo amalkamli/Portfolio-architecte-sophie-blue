@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 document.addEventListener('DOMContentLoaded', () => {
     const filtersContainer = document.querySelector('.filters');
     const gallery = document.querySelector('.gallery');
@@ -141,7 +140,6 @@ document.addEventListener('DOMContentLoaded', () => {
     gestion_connexion();
 });
 
-=======
 import config from './config.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -201,4 +199,3 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     filterFigures('all');
 });
->>>>>>> ddf3db1af3209db0395977c2a15548ccd4e9aa0a
