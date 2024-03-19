@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 document.addEventListener('DOMContentLoaded', () => {
     const filtersContainer = document.querySelector('.filters');
     const gallery = document.querySelector('.gallery');
@@ -6,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let categoriesData;
 
     // Function to fetch works data
-    function fetchWorksData() {
+     function fetchWorksData()  {
         const worksUrl = 'http://localhost:5678/api/works';
         return fetch(worksUrl)
             .then(response => response.json())
@@ -18,7 +17,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.error('Error fetching works data:', error);
             });
     }
-
     // Function to fetch categories data
     function fetchCategoriesData() {
         const categoriesUrl = 'http://localhost:5678/api/categories';
@@ -33,11 +31,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.error('Error fetching categories data:', error);
             });
     }
-
     // Function to create filter buttons
     function createFilterButtons() {
         const allButton = document.createElement('button');
-        allButton.textContent = 'All';
+        allButton.textContent = 'Tous';
+        allButton.style.backgroundColor = '#1D6154';
+    allButton.style.color = 'white';
+   
         allButton.classList.add('filter-button');
         allButton.dataset.categoryId = 'all';
         allButton.addEventListener('click', () => {
@@ -58,9 +58,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 button.classList.add('selected');
             });
             filtersContainer.appendChild(button);
-        });
+                    });
     }
-
     // Function to filter figures based on category
     function filterFigures(categoryId) {
         gallery.innerHTML = ''; // Clear the current figures
@@ -75,22 +74,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 figure.appendChild(img);
                 figure.appendChild(figcaption);
                 gallery.appendChild(figure);
-                createDeleteButton(figure, work); // Create delete button for each work
             }
         });
         removeSelectedClass();
         addSelectedClass(categoryId);
-    }
-
-    // Function to create delete button for each work
-    function createDeleteButton(figure, work) {
-        const button = document.createElement('button');
-        button.textContent = 'Delete';
-        button.classList.add('delete-button');
-        button.addEventListener('click', () => {
-            // Logic to delete the work
-        });
-        figure.appendChild(button);
     }
 
     // Function to add the class "selected" to a category element
@@ -139,66 +126,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Call the function to manage connection
     gestion_connexion();
+      
 });
 
-=======
-import config from './config.js';
-
-document.addEventListener('DOMContentLoaded', async () => {
-    const filtersContainer = document.querySelector('.filters');
-    const gallery = document.querySelector('.gallery');
-    
-    const fetchData = async (url) => {
-        const response = await fetch(url);
-        return response.json();
-    };
-
-    const createButton = (category) => {
-        const button = document.createElement('button');
-        button.textContent = category.name;
-        button.classList.add('filter-button');
-        button.dataset.categoryId = category.id;
-        button.addEventListener('click', () => {
-            filterFigures(category.id);
-        });
-        return button;
-    };
-
-    const filterFigures = (categoryId) => {
-        gallery.innerHTML = ''; // Effacer les figures actuelles
-        worksData.forEach(work => {
-            if (categoryId === 'all' || work.categoryId === categoryId) {
-                const figure = document.createElement('figure');
-                const img = document.createElement('img');
-                img.src = work.imageUrl;
-                img.alt = work.title;
-                const figcaption = document.createElement('figcaption');
-                figcaption.textContent = work.title;
-                figure.appendChild(img);
-                figure.appendChild(figcaption);
-                gallery.appendChild(figure);
-            }
-        });
-    };
-
-    let worksData = await fetchData(config.worksUrl);
-    const categoriesData = await fetchData(config.categoriesUrl);
-
-    // Créer le bouton "Tous" en dehors de la logique de tri
-    const allButton = createButton({ id: 'all', name: 'Tous' });
-    filtersContainer.appendChild(allButton);
-
-    // Trier les catégories en fonction de l'ordre désiré
-    const order = ['Tous', 'Objets', 'Appartements', 'Hotels & restaurants'];
-    const sortedCategories = categoriesData.sort((a, b) => {
-        return order.indexOf(a.name) - order.indexOf(b.name);
-    });
-
-    sortedCategories.forEach(category => {
-        const button = createButton(category);
-        filtersContainer.appendChild(button);
-    });
-
-    filterFigures('all');
-});
->>>>>>> ddf3db1af3209db0395977c2a15548ccd4e9aa0a

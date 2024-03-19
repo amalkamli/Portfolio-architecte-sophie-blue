@@ -1,70 +1,98 @@
-//CONSTANTES
-const GALLERY_MODALE = document.querySelector(".modal-gallery");
-const BUTTON_CLOSE = document.querySelector('.js-modal-close-1');
-const MODALE_WRAPPER = document.querySelector(".modal-wrapper");
-const BUTTON_MODIF_WORKS = document.querySelector('#modif_projet');
+let worksData;
+document.addEventListener("DOMContentLoaded", function() {
+    const modal = document.getElementById("modal1");
+    const modalCloseBtn = document.querySelector(".js-modal-close-1");
 
-let modal = null
+    // Définir la fonction fetchWorksData en dehors de openModal
+    function fetchWorksData() {
+        const worksUrl = 'http://localhost:5678/api/works';
+        return fetch(worksUrl)
+            .then(response => response.json())
+            .then(data => {
+                const modalGallery = document.querySelector('.modal-gallery');
+                modalGallery.innerHTML = '';
 
-//FONCTION OUVERTURE BOITE MODALE
-const OPEN_MODAL = function (e) {
-    e.preventDefault()
-    modal=document.querySelector("#modal1");
-    modal.style.display=null
-    modal.addEventListener('click', CLOSE_MODAL)
-    BUTTON_CLOSE.addEventListener('click', CLOSE_MODAL)
-    MODALE_WRAPPER.style.display="flex"
-    GALLERY_MODALE.innerHTML = '';
-    fetchWorks(GALLERY_MODALE, true);
-}
+                data.forEach(work => {
+                    const imageContainer = document.createElement('div'); // Container pour chaque image et icône
+                    const imageElement = document.createElement('img');
+                    const deleteIcon = document.createElement('i');
 
+                    imageElement.src = work.imageUrl;
+                    imageElement.alt = work.title;
 
-//FONCTION FERMETURE BOITE MODALE
-const CLOSE_MODAL = function (e) {
-    if (modal==null) return
-    //SI ON CLIQUE SUR AUTRE CHOSE QUE LA MODALE OU LE BOUTON ON NE VEUT PAS FERMER
-    if (e.target != modal && e.target != BUTTON_CLOSE && e.target != document.querySelector('.fa-solid') ) return
-    e.preventDefault
-    modal.style.display="none"
-    modal.removeEventListener('click',CLOSE_MODAL)
-    BUTTON_CLOSE.removeEventListener ('click',CLOSE_MODAL)
+                    deleteIcon.classList.add('fa', 'fa-trash'); // Font Awesome class for trash icon
+                    deleteIcon.addEventListener('click', () => deleteImage(work.id));
 
-}
+                    imageContainer.appendChild(imageElement);
+                    imageContainer.appendChild(deleteIcon);
+                    modalGallery.appendChild(imageContainer);
+                });
+            })
+            .catch(error => {
+                console.error('Une erreur s\'est produite lors de la récupération des données des travaux :', error);
+            });
+    }
 
-//AJOUT LISTENER SUR CLIQUE BOUTON MODIFIER POUR APPELER OUVERTURE MODALE  
-BUTTON_MODIF_WORKS.addEventListener('click', OPEN_MODAL)
+    // Ouvrir la modale
+    function openModal() {
+        modal.style.display= "block";
+        fetchWorksData(); // Appeler fetchWorksData() après l'ouverture de la modale
+    }
 
-//FONCTION SUPPRESSION TRAVAUX
-const DELETE_WORK = function (e) {
-    const confirmation = confirm("Êtes-vous sûr de vouloir supprimer ce projet ?");
+    // Supprimer un travail
+    function deleteImage(imageId) {
+        const confirmation = confirm("Êtes-vous sûr de vouloir supprimer ce projet ?");
 
-    if (confirmation) {
-        try {
-            deleteWorkFetch(e.target.id);
-        } catch (error) {
-            console.error("Erreur lors de la suppression du projet:", error);
+        if (confirmation) {
+            try {
+                deleteWorkFetch(imageId); // Supprimer le travail via l'API
+            } catch (error) {
+                console.error("Erreur lors de la suppression du projet:", error);
+            }
         }
     }
-}
 
-//APPEL API SUPPRESSION TRAVAUX
-function deleteWorkFetch(idWork){
+    // Fermer la modale
+    function closeModal() {
+        modal.style.display = "none";
+    }
+
+    // Événement pour ouvrir la modale
+    document.getElementById("modif_projet").addEventListener("click", openModal);
+
+    // Événement pour fermer la modale en cliquant sur le bouton de fermeture
+    modalCloseBtn.addEventListener("click", closeModal);
+
+    // Supprimer un travail via une requête DELETE à l'API
+function deleteWorkFetch(idWork) {
     let token = sessionStorage.getItem("token");
 
-    fetch (WORKS_API+'/'+idWork, {
-        method: "DELETE",
-        headers: {
-            'Accept': '*/*',
-            'Authorization': `Bearer ${token}`,
-        }
-    })
-    .then (response => {
-        if (response.status===200 || response.status===201 || response.status===204){
-            refreshWorks(GALLERY_MODALE, true); //REAFFICHAGE TRAVAUX DANS MODALE
-            refreshWorks(GALLERY_DIV,false); //REAFFICHAGE TRAVAUX DANS INDEX
-        }else {
-            alert ("Erreur lors de la suppression du projet.")
-        }
-    })
-
+    fetch(WORKS_API + '/' + idWork, {
+            method: "DELETE",
+            headers: {
+                'Accept': '*/*',
+                'Authorization': `Bearer ${token}`,
+            }
+        })
+        .then(response => {
+            if (response.status === 200 || response.status === 201 || response.status === 204) {
+                // Attendre un court laps de temps avant de rafraîchir la galerie
+                setTimeout(refreshGallery, 500); // Attendre 500 millisecondes
+            } else {
+                alert("Erreur lors de la suppression du projet.")
+            }
+        })
 }
+
+
+    // Rafraîchir la galerie
+    function refreshGallery() {
+        fetchWorksData(); // Rechargez les données de la galerie à partir de l'API
+    }
+
+    // Appeler fetchWorksData() pour afficher la galerie initiale
+    fetchWorksData();
+});
+
+
+
