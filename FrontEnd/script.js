@@ -128,4 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
     gestion_connexion();
       
 });
+<<<<<<< HEAD
 
+=======
+>>>>>>> 52479234cb2f675c4a74b168bb71caea54827b69
